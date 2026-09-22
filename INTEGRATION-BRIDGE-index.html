@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Integration Bridge | API & Webhook Reliability</title>
+<style>
+:root{--bg:#0a0d11;--p:#131820;--line:#2b3440;--txt:#f5f7fa;--muted:#9ca8b5;--ok:#68d391;--warn:#f0c766;--bad:#f07b7b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1050px;margin:auto;padding:34px 18px 70px}.ey{letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:clamp(36px,7vw,68px);margin:8px 0}p{color:var(--muted);line-height:1.55}
+.flow{display:flex;gap:8px;align-items:center;overflow:auto;padding:20px 0}.node{min-width:145px;background:var(--p);border:1px solid var(--line);padding:16px;border-radius:14px;text-align:center}.arrow{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.card{background:var(--p);border:1px solid var(--line);padding:17px;border-radius:15px}
+.num{font-size:30px;font-weight:800}.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+button{width:100%;text-align:left;background:#171d25;border:1px solid var(--line);color:var(--txt);padding:14px;border-radius:11px;margin:6px 0;font-weight:700}
+.out{display:none;background:#0e1217;border-left:3px solid var(--warn);padding:13px;margin:0 0 10px;border-radius:7px}
+.tag{display:inline-block;border:1px solid var(--line);padding:6px 9px;border-radius:999px;color:var(--muted);margin:4px}h2{margin-top:38px}
+</style></head>
+<body><main>
+<div class="ey">Portfolio Engineering Project · Systems Integration</div>
+<h1>Integration Bridge</h1>
+<p>A reliability-focused integration demo showing how data moves between systems through webhooks and APIs with validation, idempotency, retry logic, logging, and dead-letter handling.</p>
+<div class="flow">
+<div class="node">Web Form<br><small>Source</small></div><div class="arrow">→</div>
+<div class="node">Webhook<br><small>Receive</small></div><div class="arrow">→</div>
+<div class="node">Validator<br><small>Normalize</small></div><div class="arrow">→</div>
+<div class="node">API Bridge<br><small>Deliver</small></div><div class="arrow">→</div>
+<div class="node">Database<br><small>Record</small></div>
+</div>
+<div class="grid">
+<div class="card"><div class="num ok">200</div><p>valid delivery</p></div>
+<div class="card"><div class="num warn">429</div><p>rate-limit recovery</p></div>
+<div class="card"><div class="num bad">422</div><p>schema rejection</p></div>
+<div class="card"><div class="num">1×</div><p>idempotent processing</p></div>
+</div>
+<h2>Integration incidents</h2>
+<div class="card">
+<button onclick="t('a')">Malformed webhook payload · 422</button><div id="a" class="out"><b>Detect:</b> Required field fails schema validation.<br><b>Protect:</b> Reject before downstream write.<br><b>Record:</b> Store structured validation error.<br><b>Recover:</b> Correct payload and safely replay.</div>
+<button onclick="t('b')">Duplicate delivery · idempotency protection</button><div id="b" class="out"><b>Detect:</b> Event ID already processed.<br><b>Protect:</b> Skip duplicate side effects.<br><b>Record:</b> Log duplicate receipt.<br><b>Result:</b> One source event creates one downstream action.</div>
+<button onclick="t('c')">API rate limit · 429</button><div id="c" class="out"><b>Detect:</b> Downstream API returns 429.<br><b>Protect:</b> Do not discard event.<br><b>Recover:</b> Retry with bounded exponential backoff.<br><b>Escalate:</b> Dead-letter after retry budget is exhausted.</div>
+<button onclick="t('d')">Downstream outage · 503</button><div id="d" class="out"><b>Detect:</b> Temporary service failure.<br><b>Protect:</b> Preserve original payload and correlation ID.<br><b>Recover:</b> Queue for replay.<br><b>Verify:</b> Confirm downstream acknowledgement before marking delivered.</div>
+</div>
+<h2>Skills demonstrated</h2>
+<div><span class="tag">REST APIs</span><span class="tag">Webhooks</span><span class="tag">JSON</span><span class="tag">Schema Validation</span><span class="tag">Idempotency</span><span class="tag">Retry Logic</span><span class="tag">Logging</span><span class="tag">Error Handling</span><span class="tag">System Design</span></div>
+<h2>Engineering principle</h2>
+<div class="card"><div class="num">RECEIVE → VALIDATE → DELIVER → VERIFY</div><p>A successful HTTP request is not enough. Reliable integrations protect data, prevent duplicate side effects, preserve failed events, and make failures diagnosable.</p></div>
+</main><script>function t(x){let e=document.getElementById(x);e.style.display=e.style.display==='block'?'none':'block'}</script></body></html>
